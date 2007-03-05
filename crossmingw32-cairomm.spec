@@ -13,6 +13,7 @@ URL:		http://cairographics.org/
 BuildRequires:	autoconf
 BuildRequires:	automake
 BuildRequires:	crossmingw32-cairo >= 1.2.2
+BuildRequires:	crossmingw32-gcc-c++
 BuildRequires:	crossmingw32-pkgconfig
 BuildRequires:	libtool >= 2:1.5
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
