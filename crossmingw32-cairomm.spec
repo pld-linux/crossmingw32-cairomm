@@ -1,13 +1,13 @@
 Summary:	C++ wrapper for cairo - cross Mingw32 version
 Summary(pl.UTF-8):	Interfejs C++ do cairo - wersja skrośna dla Mingw32
-%define		_realname   cairomm
-Name:		crossmingw32-%{_realname}
-Version:	1.4.4
+%define		realname   cairomm
+Name:		crossmingw32-%{realname}
+Version:	1.4.6
 Release:	1
 License:	LGPL v2+
 Group:		Development/Libraries
-Source0:	http://cairographics.org/releases/%{_realname}-%{version}.tar.gz
-# Source0-md5:	a5b947eb2692b0b6c3089fcfa6ce167e
+Source0:	http://cairographics.org/releases/%{realname}-%{version}.tar.gz
+# Source0-md5:	8f5a63f01fb4c52a731a27dd0a521413
 URL:		http://cairographics.org/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -61,7 +61,7 @@ DLL cairomm library for Windows.
 Biblioteka DLL cairomm dla Windows.
 
 %prep
-%setup -q -n %{_realname}-%{version}
+%setup -q -n %{realname}-%{version}
 
 %build
 export PKG_CONFIG_LIBDIR=%{_prefix}/lib/pkgconfig
