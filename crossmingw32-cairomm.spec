@@ -1,21 +1,24 @@
-Summary:	C++ wrapper for cairo - cross Mingw32 version
-Summary(pl.UTF-8):	Interfejs C++ do cairo - wersja skrośna dla Mingw32
+Summary:	C++ wrapper for cairo - cross MinGW32 version
+Summary(pl.UTF-8):	Interfejs C++ do cairo - wersja skrośna dla MinGW32
 %define		realname   cairomm
 Name:		crossmingw32-%{realname}
-Version:	1.6.4
+Version:	1.8.4
 Release:	1
 License:	LGPL v2+
 Group:		Development/Libraries
 Source0:	http://cairographics.org/releases/%{realname}-%{version}.tar.gz
-# Source0-md5:	63561c62536173a98f03005dfe55c90e
+# Source0-md5:	559afbc47484ba3fad265e38a3dafe90
 URL:		http://cairographics.org/
-BuildRequires:	autoconf
-BuildRequires:	automake
-BuildRequires:	crossmingw32-cairo >= 1.6.0
+BuildRequires:	autoconf >= 2.62
+BuildRequires:	automake >= 1:1.10
+BuildRequires:	crossmingw32-cairo >= 1.8.0
 BuildRequires:	crossmingw32-gcc-c++
+BuildRequires:	crossmingw32-libsigc++ >= 2.0
 BuildRequires:	libtool >= 2:1.5
+BuildRequires:	mm-common
 BuildRequires:	pkgconfig >= 1:0.15
-Requires:	crossmingw32-cairo >= 1.6.0
+Requires:	crossmingw32-cairo >= 1.8.0
+Requires:	crossmingw32-libsigc++ >= 2.0
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		no_install_post_strip	1
@@ -39,28 +42,29 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		filterout_ld	-Wl,-z,.*
 
 %description
-C++ wrapper for cairo (cross mingw32 version).
+C++ wrapper for cairo (cross MinGW32 version).
 
 %description -l pl.UTF-8
-Interfejs C++ do cairo (wersja skrośna mingw32).
+Interfejs C++ do cairo (wersja skrośna MinGW32).
 
 %package static
-Summary:	Static cairomm library (cross mingw32 version)
-Summary(pl.UTF-8):	Statyczna biblioteka cairomm (wersja skrośna mingw32)
+Summary:	Static cairomm library (cross MinGW32 version)
+Summary(pl.UTF-8):	Statyczna biblioteka cairomm (wersja skrośna MinGW32)
 Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{release}
 
 %description static
-Static cairomm library (cross mingw32 version).
+Static cairomm library (cross MinGW32 version).
 
 %description static -l pl.UTF-8
-Statyczna biblioteka cairomm (wersja skrośna mingw32).
+Statyczna biblioteka cairomm (wersja skrośna MinGW32).
 
 %package dll
 Summary:	DLL cairomm library for Windows
 Summary(pl.UTF-8):	Biblioteka DLL cairomm dla Windows
 Group:		Applications/Emulators
-Requires:	crossmingw32-cairo-dll >= 1.6.0
+Requires:	crossmingw32-cairo-dll >= 1.8.0
+Requires:	crossmingw32-libsigc++-dll >= 2.0
 
 %description dll
 DLL cairomm library for Windows.
@@ -74,13 +78,13 @@ Biblioteka DLL cairomm dla Windows.
 %build
 export PKG_CONFIG_LIBDIR=%{_prefix}/lib/pkgconfig
 %{__libtoolize}
-%{__aclocal} -I m4
+%{__aclocal} -I build
 %{__automake}
 %{__autoconf}
 %configure \
+	--enable-static \
 	--target=%{target} \
-	--host=%{target} \
-	--disable-docs
+	--host=%{target}
 
 %{__make}
 
@@ -98,7 +102,7 @@ mv -f $RPM_BUILD_ROOT%{_prefix}/bin/*.dll $RPM_BUILD_ROOT%{_dlldir}
 %{target}-strip -g -R.comment -R.note $RPM_BUILD_ROOT%{_libdir}/*.a
 %endif
 
-rm -rf $RPM_BUILD_ROOT%{_docdir}/libcairomm-1.0
+%{__rm} -r $RPM_BUILD_ROOT%{_datadir}/{doc/cairomm-1.0,devhelp}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -108,9 +112,16 @@ rm -rf $RPM_BUILD_ROOT
 %doc AUTHORS ChangeLog MAINTAINERS NEWS README
 %{_libdir}/libcairomm-1.0.dll.a
 %{_libdir}/libcairomm-1.0.la
-%dir %{_includedir}/cairomm-1.0
-%{_includedir}/cairomm-1.0/*
+%{_libdir}/cairomm-1.0
+%{_includedir}/cairomm-1.0
 %{_pkgconfigdir}/cairomm-1.0.pc
+%{_pkgconfigdir}/cairomm-ft-1.0.pc
+%{_pkgconfigdir}/cairomm-pdf-1.0.pc
+%{_pkgconfigdir}/cairomm-png-1.0.pc
+%{_pkgconfigdir}/cairomm-ps-1.0.pc
+%{_pkgconfigdir}/cairomm-svg-1.0.pc
+%{_pkgconfigdir}/cairomm-win32-1.0.pc
+%{_pkgconfigdir}/cairomm-win32-font-1.0.pc
 
 %files static
 %defattr(644,root,root,755)
