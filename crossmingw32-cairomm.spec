@@ -3,7 +3,7 @@ Summary(pl.UTF-8):	Interfejs C++ do cairo - wersja skrośna dla MinGW32
 %define		realname   cairomm
 Name:		crossmingw32-%{realname}
 Version:	1.10.0
-Release:	5
+Release:	6
 License:	LGPL v2+
 Group:		Development/Libraries
 Source0:	http://cairographics.org/releases/%{realname}-%{version}.tar.gz
