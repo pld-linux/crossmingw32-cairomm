@@ -2,23 +2,24 @@ Summary:	C++ wrapper for cairo - cross MinGW32 version
 Summary(pl.UTF-8):	Interfejs C++ do cairo - wersja skrośna dla MinGW32
 %define		realname   cairomm
 Name:		crossmingw32-%{realname}
-Version:	1.10.0
-Release:	6
+Version:	1.12.0
+Release:	1
 License:	LGPL v2+
 Group:		Development/Libraries
 Source0:	http://cairographics.org/releases/%{realname}-%{version}.tar.gz
-# Source0-md5:	9c63fb1c04c8ecd3c5e6473075b8c39f
+# Source0-md5:	481501be65bcc34a605d6bc0f57a0023
 URL:		http://cairographics.org/
 BuildRequires:	autoconf >= 2.62
 BuildRequires:	automake >= 1:1.11
 BuildRequires:	crossmingw32-cairo >= 1.10.0
-BuildRequires:	crossmingw32-gcc-c++
-BuildRequires:	crossmingw32-libsigc++ >= 2.0
+BuildRequires:	crossmingw32-gcc-c++ >= 1:4.6
+BuildRequires:	crossmingw32-libsigc++ >= 2.5.1
 BuildRequires:	libtool >= 2:1.5
 BuildRequires:	mm-common >= 0.8
 BuildRequires:	pkgconfig >= 1:0.15
 Requires:	crossmingw32-cairo >= 1.10.0
-Requires:	crossmingw32-libsigc++ >= 2.0
+Requires:	crossmingw32-gcc-c++ >= 1:4.6
+Requires:	crossmingw32-libsigc++ >= 2.5.1
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		no_install_post_strip	1
@@ -68,7 +69,7 @@ Summary:	DLL cairomm library for Windows
 Summary(pl.UTF-8):	Biblioteka DLL cairomm dla Windows
 Group:		Applications/Emulators
 Requires:	crossmingw32-cairo-dll >= 1.10.0
-Requires:	crossmingw32-libsigc++-dll >= 2.0
+Requires:	crossmingw32-libsigc++-dll >= 2.5.1
 
 %description dll
 DLL cairomm library for Windows.
@@ -85,6 +86,8 @@ export PKG_CONFIG_LIBDIR=%{_prefix}/lib/pkgconfig
 %{__aclocal} -I build
 %{__automake}
 %{__autoconf}
+# mingw32 requires gnu++11 (instead of c++11) for M_PI
+CXXFLAGS="%{rpmcxxflags} -std=gnu++11"
 %configure \
 	--enable-static \
 	--target=%{target} \
@@ -99,7 +102,7 @@ rm -rf $RPM_BUILD_ROOT
 	DESTDIR=$RPM_BUILD_ROOT
 
 install -d $RPM_BUILD_ROOT%{_dlldir}
-mv -f $RPM_BUILD_ROOT%{_prefix}/bin/*.dll $RPM_BUILD_ROOT%{_dlldir}
+%{__mv} $RPM_BUILD_ROOT%{_prefix}/bin/*.dll $RPM_BUILD_ROOT%{_dlldir}
 
 %if 0%{!?debug:1}
 %{target}-strip --strip-unneeded -R.comment -R.note $RPM_BUILD_ROOT%{_dlldir}/*.dll
