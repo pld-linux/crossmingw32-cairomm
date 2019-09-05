@@ -136,4 +136,4 @@ rm -rf $RPM_BUILD_ROOT
 
 %files dll
 %defattr(644,root,root,755)
-%{_dlldir}/libcairomm-1.0-*.dll
+%{_dlldir}/libcairomm-1.0-1.dll
