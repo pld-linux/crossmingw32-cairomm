@@ -3,7 +3,7 @@ Summary(pl.UTF-8):	Interfejs C++ do cairo - wersja skrośna dla MinGW32
 %define		realname   cairomm
 Name:		crossmingw32-%{realname}
 Version:	1.12.2
-Release:	4
+Release:	5
 License:	LGPL v2+
 Group:		Development/Libraries
 Source0:	https://www.cairographics.org/releases/%{realname}-%{version}.tar.gz
@@ -104,6 +104,8 @@ rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT%{_dlldir}
 %{__mv} $RPM_BUILD_ROOT%{_prefix}/bin/*.dll $RPM_BUILD_ROOT%{_dlldir}
 
+%{__rm} $RPM_BUILD_ROOT%{_libdir}/libcairomm-*.la
+
 %if 0%{!?debug:1}
 %{target}-strip --strip-unneeded -R.comment -R.note $RPM_BUILD_ROOT%{_dlldir}/*.dll
 %{target}-strip -g -R.comment -R.note $RPM_BUILD_ROOT%{_libdir}/*.a
@@ -118,7 +120,6 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %doc AUTHORS ChangeLog MAINTAINERS NEWS README
 %{_libdir}/libcairomm-1.0.dll.a
-%{_libdir}/libcairomm-1.0.la
 %{_libdir}/cairomm-1.0
 %{_includedir}/cairomm-1.0
 %{_pkgconfigdir}/cairomm-1.0.pc
