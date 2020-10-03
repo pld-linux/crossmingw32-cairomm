@@ -2,24 +2,27 @@ Summary:	C++ wrapper for cairo - cross MinGW32 version
 Summary(pl.UTF-8):	Interfejs C++ do cairo - wersja skrośna dla MinGW32
 %define		realname   cairomm
 Name:		crossmingw32-%{realname}
-Version:	1.12.2
-Release:	5
+Version:	1.14.2
+Release:	1
 License:	LGPL v2+
 Group:		Development/Libraries
-Source0:	https://www.cairographics.org/releases/%{realname}-%{version}.tar.gz
-# Source0-md5:	9d2282ea34cf9aaa89208bb4bb911909
+Source0:	https://www.cairographics.org/releases/%{realname}-%{version}.tar.xz
+# Source0-md5:	fbcaad2d3756b42592fe8c92b39945f5
 URL:		https://www.cairographics.org/
-BuildRequires:	autoconf >= 2.62
-BuildRequires:	automake >= 1:1.11
-BuildRequires:	crossmingw32-cairo >= 1.10.0
+BuildRequires:	crossmingw32-cairo >= 1.12.0
 BuildRequires:	crossmingw32-gcc-c++ >= 1:4.6
-BuildRequires:	crossmingw32-libsigc++ >= 2.5.1
-BuildRequires:	libtool >= 2:1.5
+BuildRequires:	crossmingw32-libsigc++ >= 2.6.0
+BuildRequires:	meson >= 0.50.0
 BuildRequires:	mm-common >= 0.8
+BuildRequires:	ninja >= 1.5
 BuildRequires:	pkgconfig >= 1:0.15
-Requires:	crossmingw32-cairo >= 1.10.0
+BuildRequires:	python3 >= 1:3.5
+BuildRequires:	rpmbuild(macros) >= 1.736
+BuildRequires:	tar >= 1:1.22
+BuildRequires:	xz
+Requires:	crossmingw32-cairo >= 1.12.0
 Requires:	crossmingw32-gcc-c++ >= 1:4.6
-Requires:	crossmingw32-libsigc++ >= 2.5.1
+Requires:	crossmingw32-libsigc++ >= 2.6.0
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		no_install_post_strip	1
@@ -37,14 +40,10 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		__pkgconfig_provides	%{nil}
 %define		__pkgconfig_requires	%{nil}
 
-%define		_ssp_cflags		%{nil}
-%ifnarch %{ix86}
-# arch-specific flags (like alpha's -mieee) are not valid for i386 gcc
-%define		optflags	-O2
-%endif
 # -z options are invalid for mingw linker, most of -f options are Linux-specific
 %define		filterout_ld	-Wl,-z,.*
-%define		filterout_c		-f[-a-z0-9=]*
+%define		filterout_c	-f[-a-z0-9=]*
+%define		filterout_cxx	-f[-a-z0-9=]*
 
 %description
 C++ wrapper for cairo (cross MinGW32 version).
@@ -68,8 +67,8 @@ Statyczna biblioteka cairomm (wersja skrośna MinGW32).
 Summary:	DLL cairomm library for Windows
 Summary(pl.UTF-8):	Biblioteka DLL cairomm dla Windows
 Group:		Applications/Emulators
-Requires:	crossmingw32-cairo-dll >= 1.10.0
-Requires:	crossmingw32-libsigc++-dll >= 2.5.1
+Requires:	crossmingw32-cairo-dll >= 1.12.0
+Requires:	crossmingw32-libsigc++-dll >= 2.6.0
 
 %description dll
 DLL cairomm library for Windows.
@@ -80,38 +79,47 @@ Biblioteka DLL cairomm dla Windows.
 %prep
 %setup -q -n %{realname}-%{version}
 
+cat > meson-cross.txt <<'EOF'
+[host_machine]
+system = 'windows'
+cpu_family = 'x86'
+cpu = 'i386'
+endian='little'
+[binaries]
+c = '%{target}-gcc'
+cpp = '%{target}-g++'
+ar = '%{target}-ar'
+windres = '%{target}-windres'
+pkgconfig = 'pkg-config'
+[properties]
+%ifarch %{ix86}
+c_args = ['%(echo %{rpmcflags} | sed -e "s/ \+/ /g;s/ /', '/g")']
+%else
+# arch-specific flags (like alpha's -mieee) are not valid for i386 gcc.
+# now at least i486 is required for atomic operations
+c_args = ['-O2']
+%endif
+EOF
+
 %build
 export PKG_CONFIG_LIBDIR=%{_prefix}/lib/pkgconfig
-%{__libtoolize}
-%{__aclocal} -I build
-%{__automake}
-%{__autoconf}
-# mingw32 requires gnu++11 (instead of c++11) for M_PI
-CXXFLAGS="%{rpmcxxflags} -std=gnu++11"
-%configure \
-	--enable-static \
-	--target=%{target} \
-	--host=%{target}
+%meson build \
+	--cross-file meson-cross.txt
 
-%{__make}
+%ninja_build -C build
 
 %install
 rm -rf $RPM_BUILD_ROOT
 
-%{__make} install \
-	DESTDIR=$RPM_BUILD_ROOT
+%ninja_install -C build
 
 install -d $RPM_BUILD_ROOT%{_dlldir}
 %{__mv} $RPM_BUILD_ROOT%{_prefix}/bin/*.dll $RPM_BUILD_ROOT%{_dlldir}
-
-%{__rm} $RPM_BUILD_ROOT%{_libdir}/libcairomm-*.la
 
 %if 0%{!?debug:1}
 %{target}-strip --strip-unneeded -R.comment -R.note $RPM_BUILD_ROOT%{_dlldir}/*.dll
 %{target}-strip -g -R.comment -R.note $RPM_BUILD_ROOT%{_libdir}/*.a
 %endif
-
-%{__rm} -r $RPM_BUILD_ROOT%{_datadir}/{doc/cairomm-1.0,devhelp}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
