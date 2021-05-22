@@ -2,12 +2,12 @@ Summary:	C++ wrapper for cairo - cross MinGW32 version
 Summary(pl.UTF-8):	Interfejs C++ do cairo - wersja skrośna dla MinGW32
 %define		realname   cairomm
 Name:		crossmingw32-%{realname}
-Version:	1.14.2
+Version:	1.14.3
 Release:	1
 License:	LGPL v2+
 Group:		Development/Libraries
 Source0:	https://www.cairographics.org/releases/%{realname}-%{version}.tar.xz
-# Source0-md5:	fbcaad2d3756b42592fe8c92b39945f5
+# Source0-md5:	0b9a35ccefbba379fd8f3dbda67ec327
 URL:		https://www.cairographics.org/
 BuildRequires:	crossmingw32-cairo >= 1.12.0
 BuildRequires:	crossmingw32-gcc-c++ >= 1:4.6
@@ -26,6 +26,7 @@ Requires:	crossmingw32-libsigc++ >= 2.6.0
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		no_install_post_strip	1
+%define		_enable_debug_packages	0
 
 %define		target			i386-mingw32
 %define		target_platform 	i386-pc-mingw32
